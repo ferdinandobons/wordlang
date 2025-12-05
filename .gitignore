@@ -1,0 +1,19 @@
+# Compiled binary
+wordlang
+
+# Object files
+*.o
+src/*.o
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Debug
+*.dSYM/
+
