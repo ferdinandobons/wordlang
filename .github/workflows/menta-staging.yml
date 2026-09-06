@@ -11,13 +11,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: menta-vercel-staging-20260906
-      - name: Assemble bundle when all chunks exist
+      - name: Assemble self-contained loader
         shell: bash
         run: |
           set -euo pipefail
-          for n in 01 02 03 04 05; do test -f ".menta-parts/part${n}.txt" || exit 0; done
-          cat .menta-parts/part*.txt | base64 -d > menta.html
-          test "$(wc -c < menta.html)" -eq 171677
+          for n in $(seq 1 11); do test -f "menta-staging/p${n}.js" || exit 0; done
+          test -f menta-staging/boot.js || exit 0
+          {
+            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Menta</title></head><body><div id="loading" style="font:16px system-ui;padding:40px">Menta…</div>'
+            for n in $(seq 1 11); do printf '<script>'; cat "menta-staging/p${n}.js"; printf '</script>\n'; done
+            printf '<script>'; cat menta-staging/boot.js; printf '</script></body></html>\n'
+          } > menta.html
+          test "$(wc -c < menta.html)" -gt 70000
       - name: Commit assembled bundle
         shell: bash
         run: |
