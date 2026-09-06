@@ -1,0 +1,30 @@
+name: Menta staging assembler
+on:
+  push:
+    branches: [menta-vercel-staging-20260906]
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: menta-vercel-staging-20260906
+      - name: Assemble bundle when all chunks exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          for n in 01 02 03 04 05; do test -f ".menta-parts/part${n}.txt" || exit 0; done
+          cat .menta-parts/part*.txt | base64 -d > menta.html
+          test "$(wc -c < menta.html)" -eq 171677
+      - name: Commit assembled bundle
+        shell: bash
+        run: |
+          if [ ! -f menta.html ]; then exit 0; fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add menta.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Assemble Menta staging bundle'
+          git push
