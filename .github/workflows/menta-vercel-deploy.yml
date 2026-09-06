@@ -1,0 +1,27 @@
+name: Menta Vercel Deploy
+
+on:
+  push:
+    branches:
+      - menta-vercel-deploy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy Menta to Vercel production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "VERCEL_TOKEN secret is not configured in this repository."
+            exit 2
+          fi
+          npx --yes vercel@latest deploy --prod --yes --token="$VERCEL_TOKEN"
