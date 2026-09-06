@@ -1,0 +1,1 @@
+(async()=>{try{const b=atob(window.__MENTA_PACK.join(''));const u=Uint8Array.from(b,c=>c.charCodeAt(0));const ds=new DecompressionStream('gzip');const html=await new Response(new Blob([u]).stream().pipeThrough(ds)).text();document.open();document.write(html);document.close()}catch(e){document.getElementById('loading').textContent='Unable to load Menta';console.error(e)}})();
